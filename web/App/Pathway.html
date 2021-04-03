@@ -19,10 +19,10 @@
 <link rel="stylesheet" href="libraries/bootstrapCollector.css">
 <script src="libraries/bootstrap.4.0.min.js"></script>
 
-<script src="Code/Collector.js"></script>
-<script src="Code/OnlineTriggers.js"></script>
-<script src="Code/CollectorEncrypt.js"></script>
-<script src="Code/BrowserCheck.js"></script>
+<script src="libraries/collector/Collector.js"></script>
+<script src="libraries/collector/OnlineTriggers.js"></script>
+<script src="libraries/collector/CollectorEncrypt.js"></script>
+<script src="libraries/collector/BrowserCheck.js"></script>
 
 <!--
     Collector (Garcia, Kornell, Kerr, Blake & Haffey)
@@ -127,7 +127,7 @@ function get_gets() {
                       '</label>'+
                     '</td>' +
                     '<td style="padding:5px;">' +
-                      "<a href='RunStudy.html?location=" +
+                      "<a href='Run.html?location=" +
                         item +
                         "&platform=" +
                         Pathway.get_vars.platform +
@@ -196,7 +196,7 @@ function get_gets() {
                     '</label>'+
                   '</td>' +
                   '<td style="padding:5px;">' +
-                    "<a href='RunStudy.html?location=" +
+                    "<a href='Run.html?location=" +
                       item +
                       "&platform=" +
                       "github" +

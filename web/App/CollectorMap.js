@@ -15,7 +15,7 @@ window.Handsontable || document.write('<link rel="stylesheet" href="Handsontable
 '<\/script><script type="text/javascript" charset="utf-8" src="Handsontables/HandsontablesFunctions.js"><\/script>');
 
 
-window.Collector || document.write('<script src="Code/Collector.js"><\/script>');
+window.Collector || document.write('<script src="libraries/collector/Collector.js"><\/script>');
 
 
 var isolation_map = {
@@ -28,13 +28,12 @@ var isolation_map = {
   			"info_sheet.csv"					: 'file'
       },
       DefaultTrialtypes:{
-        "instruct.html" : "file",
+        "instruct.html" :         "file",
   			"instruct_keyboard.html": "file",
-        "survey.html"   : "file",
-  			"text.html"     : "file"
-      },
-      "default_experiment.json" : "file",
-        //stuff here
+        "survey.html":            "file",
+  			"text.html":              "file",
+        "webgazer.html":          "file"
+      }
     },
   },
   Help:{
@@ -44,22 +43,22 @@ var isolation_map = {
     "ProcHelp.json" : "file",
     "SurvHelp.json" : "file",
   },
-  Studies:{
+  Projects:{
     SheetEditor:{
       "SheetEditor.html" : "file"
-    },
-    TrialTypeEditor:{
-      "TrialTypeEditor.html" : "file",
-      "Graphic.html"         : "file",
     }
   },
   Surveys : {
     'Surveys.html'    : 'file',
   },
+  Code:{
+    "Code.html" : "file",
+    "Graphic.html"    : "file",
+  },
   "CollectorMap.js" : "file",
   "jsFunctions.js"  : "file",
   "Libraries.html"  : "file",
-  "RunStudy.html"   : "file"
+  "Run.html"   : "file"
 }
 
 function this_map(this_item){
@@ -122,8 +121,8 @@ if(typeof(master_json) == "undefined"){
       default_surveys:{},
     },
     trialtypes : {
-      user_trialtypes : {},
-      default_trialtypes: {}
+      user : {},
+      default: {}
     }
   }
 }
