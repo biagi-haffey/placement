@@ -1,5 +1,5 @@
-item,code,max time,text,shuffle 1,flashcards_sheet,survey,
-0,survey,user,,off,,group_a_info.csv,
+item,code,max time,text,shuffle 1,flashcards_sheet,survey,notes,
+0,survey,user,,off,,group_a_info.csv,,
 0,instruct,user,"You are about to presented with some cards. <br>
 <br>
 You can choose which to learn at whatever pace you like.<br>
@@ -14,5 +14,5 @@ You will not be competing with other participants for the other cards.<br>
 <br>
 If you have any questions do ask the researcher before starting.<br>
 <br>
-You will have 30 minutes to revise the cards.",off,,,
-2,flashcard,1800,This is the start of a new experiment.,off,flashcards_1.csv,,
+You will have 30 minutes to revise the cards.",off,,,,
+2,flashcard,1800,This is the start of a new experiment.,off,flashcards_1.csv,,,
