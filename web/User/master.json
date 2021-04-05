@@ -1024,17 +1024,6 @@
           null
         ],
         [
-          "ethnicity",
-          "If you would like to please state your ethnicity",
-          "text",
-          "",
-          "Yes",
-          "",
-          "",
-          "",
-          null
-        ],
-        [
           "uor_student",
           "Are you a student at the University of Reading?",
           "likert",
@@ -2025,7 +2014,8 @@
           "Optional",
           "Values",
           "side_by_side",
-          "btn_width"
+          "btn_width",
+          null
         ],
         [
           "Gender",
@@ -2035,7 +2025,8 @@
           "No",
           "",
           "yes",
-          "100px"
+          "100px",
+          null
         ],
         [
           "Age",
@@ -2045,7 +2036,8 @@
           "No",
           "",
           "",
-          ""
+          "",
+          null
         ],
         [
           "Education",
@@ -2055,7 +2047,8 @@
           "No",
           "",
           "",
-          ""
+          "",
+          null
         ],
         [
           "English_Fluency",
@@ -2065,7 +2058,8 @@
           "No",
           "",
           "yes",
-          "200px"
+          "200px",
+          null
         ],
         [
           "English_Age",
@@ -2075,7 +2069,8 @@
           "No",
           "",
           "",
-          ""
+          "",
+          null
         ],
         [
           "Country",
@@ -2085,7 +2080,8 @@
           "No",
           "",
           "",
-          ""
+          "",
+          null
         ],
         [
           "Handedness",
@@ -2095,7 +2091,8 @@
           "No",
           "",
           "yes",
-          "100px"
+          "100px",
+          null
         ],
         [
           "ethnicity",
@@ -2105,10 +2102,12 @@
           "Yes",
           "",
           "",
-          ""
+          "",
+          null
         ],
         [
-          ""
+          "",
+          null
         ]
       ],
       "empathy_quotient_40.csv": [
@@ -3460,17 +3459,6 @@
               "",
               "yes",
               "100px",
-              null
-            ],
-            [
-              "ethnicity",
-              "If you would like to please state your ethnicity",
-              "text",
-              "",
-              "Yes",
-              "",
-              "",
-              "",
               null
             ],
             [

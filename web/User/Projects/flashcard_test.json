@@ -364,17 +364,6 @@
         null
       ],
       [
-        "ethnicity",
-        "If you would like to please state your ethnicity",
-        "text",
-        "",
-        "Yes",
-        "",
-        "",
-        "",
-        null
-      ],
-      [
         "uor_student",
         "Are you a student at the University of Reading?",
         "likert",
