@@ -613,6 +613,8 @@ $("#save_btn").on("click", function(){
       });
       this_proc = cleaned_parsed_proc.map(function(row, row_index){
         var cleaned_row = Collector.clean_obj_keys(row);
+        console.log("cleaned_row");
+        console.log(cleaned_row);
         if(code_files.indexOf(cleaned_row["code"]) == -1){
           code_files.push(cleaned_row["code"].toLowerCase());
         }
@@ -672,7 +674,7 @@ $("#save_btn").on("click", function(){
     return this_proj;
   }
 
-  try{
+  // try{
     $("#save_code_button").click();
     $("#save_survey_btn").click();
     $("#save_snip_btn").click();
@@ -786,12 +788,13 @@ $("#save_btn").on("click", function(){
     Collector.tests.pass("projects",
                          "save_at_start");
 
-
+  /*
   }  catch (error){
     Collector.tests.fail("projects",
                          "save_at_start",
                          error);
   }
+  */
 });
 
 $("#stim_select").on("change",function(){
