@@ -42,6 +42,10 @@
   width: 200px;
   height:200px
 }
+#flashcard_text{
+  margin:5px;
+  padding:10px;
+}
 </style>
 
 <body>
@@ -123,15 +127,16 @@ function backFlip() {
     "font-size",
     cards_array[current_card]["font-size"]
   );
-  $(".flashcard_box").css("line-height","normal");
   var this_card = cards_array[current_card]["answer"];
-  //image	image_front	image_back
-
-  /// D:/github/sos/collector-dev/web/User/Stimuli/flashcards/stroop.jpg
-  // ../User/Stimuli/flashcards/synaesthesia.jpg
-
-  // file:///C:/Users/antho/Documents/Collector//User/Stimuli/flashcards/stroop.jpg
-
+  
+  if(cards_array[current_card].competition == "yes"){
+    $("#flashcard_text").css("background-color","red");
+    $("#flashcard_text").css("color","white");
+  } else {
+    $("#flashcard_text").css("background-color","white");
+    $("#flashcard_text").css("color","black");
+  }
+  
   if(cards_array[current_card].image_back == "yes"){
     $("#flashcard_image").attr("src", cards_array[current_card].image);
     $("#flashcard_image").show();
@@ -146,7 +151,14 @@ function hideMe(){
 function frontFlip(){
   var this_card = cards_array[current_card]["cue"];
   $(".flashcard_box").css("font-size","25px");
-  //$(".flashcard_box").css("line-height","400px");
+  
+  if(cards_array[current_card].competition == "yes"){
+    $("#flashcard_text").css("background-color","red");
+    $("#flashcard_text").css("color","white");
+  } else {
+    $("#flashcard_text").css("background-color","white");
+    $("#flashcard_text").css("color","black");
+  }
   
   if(cards_array[current_card].image_front == "yes"){
     $("#flashcard_image").attr("src", cards_array[current_card].image);
