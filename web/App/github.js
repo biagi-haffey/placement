@@ -335,31 +335,25 @@ $("#push_repo_btn").on("click",function(){
 });
 
 $("#select_organization").on("change", function(){
-  bootbox.confirm("If you change this you will lose any changes to this repository since you last saved - would you like to proceed?", function(result){
-    if(result){
-      $("#select_repository").attr("disabled",false);
-      $("#add_repository_btn").attr("disabled",false);
-      var this_org = $("#select_organization").val();
+  $("#select_repository").attr("disabled",false);
+  $("#add_repository_btn").attr("disabled",false);
+  var this_org = $("#select_organization").val();
 
 
-      $("#select_repository").empty();
-      github_json[this_org].forEach(function(repository){
-        $('#select_repository').append($('<option>', {
-            value: repository,
-            text:  repository
-        }));
-      });
-
-      $('#select_repository').append($('<option>', {
-          value: "Select a repository",
-          text:  "Select a repository",
-          disabled: true
-      }));
-      $('#select_repository').val("Select a repository");
-    } else {
-      $("#select_organization").val(github_json.organization)
-    }
+  $("#select_repository").empty();
+  github_json[this_org].forEach(function(repository){
+    $('#select_repository').append($('<option>', {
+        value: repository,
+        text:  repository
+    }));
   });
+
+  $('#select_repository').append($('<option>', {
+      value: "Select a repository",
+      text:  "Select a repository",
+      disabled: true
+  }));
+  $('#select_repository').val("Select a repository");
 });
 
 $("#select_repository").on("change", function(){
@@ -383,7 +377,7 @@ $("#select_repository").on("change", function(){
       master.github.organization = this_org;
       master.github.repository = $("#select_repository").val();
       $("#save_btn").click();
-      //location.reload();
+      location.reload();
     } else {
       $("#select_repository").val(
         master

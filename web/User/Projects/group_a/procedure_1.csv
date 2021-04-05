@@ -1,0 +1,3 @@
+item,code,max time,text,shuffle 1,flashcards_sheet,survey,
+0,instruct,,You are about to presented with some cards. You can choose which to learn at whatever pace you like.,off,,,
+2,flashcard,user,This is the start of a new experiment.,off,flashcards.csv,,

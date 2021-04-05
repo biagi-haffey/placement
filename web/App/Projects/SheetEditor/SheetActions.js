@@ -185,7 +185,11 @@ $("#download_project_button").on("click",function(){
 		value: default_filename, //"data.csv",
 		callback:function(result){
 			if(result){
-				Collector.download_file(result,JSON.stringify(project_json),"json");
+				Collector.download_file(
+          result,
+          JSON.stringify(project_json, null, 2),
+          "json"
+        );
 			}
 		}
 	});
@@ -775,7 +779,7 @@ $("#save_btn").on("click", function(){
           )
         }
       }
-    } else {      
+    } else {
       var write_response = Collector.electron.fs.write_file(
         "",
         "master.json",
