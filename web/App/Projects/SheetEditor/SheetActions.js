@@ -423,19 +423,9 @@ $("#run_btn").on("click",function(){
 		});
     */
 	}
-  if(typeof(github_json) == "undefined"){
-    try{
-      github_json = JSON.parse(Collector.electron.git.load_master());
-      var organization = github_json.organization;
-      var repository   = github_json.repository;
-    } catch(error){
-      organization = "Your github json seems broken";
-      repository = "";
-    }
-  } else {
-    var organization = github_json.organization;
-    var repository   = github_json.repository;
-  }
+  var organization = master.github.organization;
+  var repository   = master.github.repository;
+
 
   var github_url =  "https://" +
     organization +

@@ -23,8 +23,8 @@
 
 .flashcard_box{
   border: 2px solid teal;
-  width: 400px;
-  height: 250px;
+  width: 600px;
+  height: 400px;
   text-align: center;
   font-size: 25px;
   border-radius: 15px;
@@ -114,9 +114,8 @@ var cues = cards_array.map(function(card, index){
 
 $("#card_list").html(cues);
 function loadCard(clicked_id) {
-  var this_card = cards_array[clicked_id]["cue"];
-  $(".flashcard_box").html(this_card);
   current_card = clicked_id;
+  frontFlip();
 }
 
 function backFlip() {
@@ -131,6 +130,7 @@ function backFlip() {
   /// D:/github/sos/collector-dev/web/User/Stimuli/flashcards/stroop.jpg
   // ../User/Stimuli/flashcards/synaesthesia.jpg
 
+  // file:///C:/Users/antho/Documents/Collector//User/Stimuli/flashcards/stroop.jpg
 
   if(cards_array[current_card].image_back == "yes"){
     $("#flashcard_image").attr("src", cards_array[current_card].image);
@@ -146,10 +146,18 @@ function hideMe(){
 function frontFlip(){
   var this_card = cards_array[current_card]["cue"];
   $(".flashcard_box").css("font-size","25px");
-  $(".flashcard_box").css("line-height","200px");
+  //$(".flashcard_box").css("line-height","400px");
+  
+  if(cards_array[current_card].image_front == "yes"){
+    $("#flashcard_image").attr("src", cards_array[current_card].image);
+    $("#flashcard_image").show();
+  } else {
+    $("#flashcard_image").hide();
+  }
+  
   $("#flashcard_text").html(this_card);
 }
 
-window.setTimeout(Trial.submit(), 1800000); //1800000ms = 30 mins
+window.setTimeout(Phase.submit(), 1800000); //1800000ms = 30 mins
 
 </script>
