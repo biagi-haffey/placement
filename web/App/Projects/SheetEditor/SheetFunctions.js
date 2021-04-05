@@ -19,7 +19,7 @@
 */
 function check_trialtypes_in_proc(procedure,post_trialtype){
 	var experiment 		= $("#project_list").val();
-	var this_proj   		= master_json.project_mgmt.projects[project];
+	var this_proj   		= master.project_mgmt.projects[project];
 	var this_proc  		= this_proj.all_procs[procedure];
 	var trialtypes 		= [];
 	var trial_type_col  = this_proc[0].map(function(element){
@@ -36,23 +36,23 @@ function check_trialtypes_in_proc(procedure,post_trialtype){
 	}
 	trialtypes = trialtypes.filter(n => n);
 	console.dir(trialtypes);
-	if(typeof(master_json.project_mgmt.projects[project].trialtypes) == "undefined"){
-		master_json.project_mgmt.projects[project].trialtypes = {};
+	if(typeof(master.project_mgmt.projects[project].trialtypes) == "undefined"){
+		master.project_mgmt.projects[project].trialtypes = {};
 	}
 	trialtypes.forEach(function(trialtype){
-		if(typeof(master_json.code.user[trialtype]) !== "undefined"){
-			master_json.project_mgmt.projects[project].trialtypes[trialtype] = master_json.code.user[trialtype];
-		} else if(typeof(master_json.code.default[trialtype]) !== "undefined"){
-			master_json.project_mgmt.projects[project].trialtypes[trialtype] = master_json.code.default[trialtype];
+		if(typeof(master.code.user[trialtype]) !== "undefined"){
+			master.project_mgmt.projects[project].trialtypes[trialtype] = master.code.user[trialtype];
+		} else if(typeof(master.code.default[trialtype]) !== "undefined"){
+			master.project_mgmt.projects[project].trialtypes[trialtype] = master.code.default[trialtype];
 		} else {
 			Collector.custom_alert("Invalid trialtype <b>"+trialtype+"</b> in at least one of your procedure sheets. The file will save, but the experiment won't run until you use a valid trialtype.",4000);
 		}
 	});
 }
 function clean_conditions(){
-  exp_json = master_json.project_mgmt.projects[$("#project_list").val()];
+  project_json = master.project_mgmt.projects[$("#project_list").val()];
 
-  var parsed_conditions = Collector.PapaParsed(exp_json.conditions);
+  var parsed_conditions = Collector.PapaParsed(project_json.conditions);
   parsed_conditions = parsed_conditions.filter(row => row.procedure !== "");
   parsed_conditions = parsed_conditions.map(function(row){
     row.name = row.name.replaceAll(" ","_");
@@ -64,7 +64,7 @@ function clean_conditions(){
     return row;
   });
 
-  exp_json.conditions = Papa.unparse(parsed_conditions);
+  project_json.conditions = Papa.unparse(parsed_conditions);
 
   update_handsontables();
 }
@@ -121,9 +121,20 @@ function get_HoT_data(current_sheet) { // needs to be adjusted for
 }
 function list_projects(){
   try{
-    name_list = Object.keys(master_json.project_mgmt.projects);
-    function update_exp_list(){
+    var local_projects = Collector
+      .electron
+      .fs
+      .list_projects();
 
+    local_projects.forEach(function(project){
+      master.project_mgmt.projects[project] = JSON.parse(
+        Collector.electron.fs.read_file("Projects",project + ".json")
+      );
+    });
+
+    name_list = Object.keys(master.project_mgmt.projects);
+
+    function update_proj_list(){
       /*
       * reset the selects
       */
@@ -154,32 +165,8 @@ function list_projects(){
 
       });
     }
-    //do longer synch with dropbox if the user is using dropbox
-    if(dropbox_check()){
-      dbx.filesListFolder({path:"/experiments"})
-          .then(function(experiments){
-            experiments.entries.forEach(function(entry){
-              if(entry[".tag"] == "file" && entry.name.indexOf(".json") !== -1 ){
-                var entry_name = entry.name.toLowerCase().replace(".json","");
-                //do not write over master_json for now if there is an experiment json with the same name
-                if(name_list.indexOf(entry_name) == -1){
-                  name_list.push(entry_name);
-                  synch_experiment(entry_name);
-                }
-              }
-            });
-            update_exp_list();
-          })
-          .catch(function(error){
-            Collector.tests.report_error("problem listing the experiments", "problem listing the experiments");
-          });
-    } else { //just a sanity check that the user is in fact using a localhost version
-      switch(Collector.detect_context()){
-        case "localhost":
-          update_exp_list()
-          break;
-      }
-    }
+
+    update_proj_list();
     Collector.tests.pass("projects",
                          "list");
   } catch(error){
@@ -188,80 +175,38 @@ function list_projects(){
                          error);
   }
 }
-function new_experiment(experiment){
-  if($("#project_list").text().indexOf(experiment) !== -1){
+function new_project(project){
+  if($("#project_list").text().indexOf(project) !== -1){
 		bootbox.alert("Name already exists. Please try again.");
 	} else {
 
-    //create it first in dropbox, THEN update table with location
-		master_json.project_mgmt.projects[project] = JSON.parse(
+    master.project_mgmt.projects[project] = JSON.parse(
       JSON.stringify(default_experiment)
     );
 
-		var this_path = "/Projects/" + experiment + ".json";
+		var this_path = "/Projects/" + project + ".json";
 
-    function update_project_list(experiment){
+    function update_project_list(project){
 			$('#project_list').append($('<option>', {
-        text : experiment
+        text : project
       }));
-      $("#project_list").val(experiment);
+      $("#project_list").val(project);
       update_handsontables();
-      update_master_json();
-			$("#save_btn").click();
+      $("#save_btn").click();
     }
-		if(dropbox_check()){
-      dbx_obj.new_upload({path:this_path,contents:JSON.stringify(default_experiment)},function(result){
-        dbx.sharingCreateSharedLink({path:this_path})
-          .then(function(returned_link){
-            switch(Collector.detect_context()){
-              case "server":
-							case "gitpod":
-							case "github":
-								update_project_list(experiment);
-								break;
-            }
-          })
-          .catch(function(error){
-            Collector.tests.report_error("new_experiment trying to share link","new_experiment trying to share link");
-          });
-      },function(error){
-        Collector.tests.report_error("new_experiment trying to upload template to dropbox","new_experiment trying to upload template to dropbox");
-      },
-      "filesUpload");
-
-    } else {
-
-			update_project_list(experiment);
-    }
+		update_project_list(project);
 	}
-
 }
-function remove_from_list(experiment){
+function remove_from_list(project){
 	var x = document.getElementById("project_list");
-	x.remove(experiment);
-	if(experiment !== "Select a dropbox experiment"){
+	x.remove(project);
+	if(project !== "Select a project"){
 		update_handsontables();
 	}
 }
-function renderItems() {
-  // Highlight to users which accounts they are logged in with
-  ////////////////////////////////////////////////////////////
-  highlight_account("dropbox_account_email");
-  highlight_account("collector_account_email");
 
-  first_load = true;
-
-  list_projects();
-	list_mods();
-  list_surveys();
-	list_code();
-	list_graphics();
-  list_servers();
-	initiate_actions();
-  autoload_mods();
-}
 function stim_proc_defaults(proc_values,stim_values){
-	var this_proj   = master_json.project_mgmt.projects[$("#project_list").val()];
+	var this_proj   = master.project_mgmt.projects[$("#project_list").val()];
 
 	// selecting Stimuli_1 and Procedure_1 as default
 	if(proc_values.indexOf("Procedure_1") !== -1){
@@ -278,22 +223,12 @@ function stim_proc_defaults(proc_values,stim_values){
 	}
 }
 function stim_proc_selection(stim_proc,sheet_selected){
-	var this_proj   = master_json.project_mgmt.projects[$("#project_list").val()];
+	var this_proj   = master.project_mgmt.projects[$("#project_list").val()];
 	createExpEditorHoT(this_proj.all_stims[sheet_selected],stim_proc,sheet_selected);	//sheet_name
 }
-function synch_experiment(entry_name){
-	dbx.sharingCreateSharedLink({path:"/experiments/" + entry_name + ".json"})
-		.then(function(result){
-			$.get(result.url.replace("www.","dl."), function(exp_json){
-				master_json.project_mgmt.projects[entry_name] = JSON.parse(exp_json);
-			});
-		})
-		.catch(function(error){
-			Collector.tests.report_error("problem synching the experiment","problem synching the experiment");
-		});
-}
+
 function update_dropdown_lists(){
-	var this_proj   = master_json.project_mgmt.projects[$("#project_list").val()];
+	var this_proj   = master.project_mgmt.projects[$("#project_list").val()];
 	var stim_values = [];
 	var proc_values = [];
 
@@ -320,7 +255,7 @@ function update_dropdown_lists(){
 	stim_proc_defaults(proc_values,stim_values);
 }
 function update_handsontables(){
-	var this_proj   = master_json.project_mgmt.projects[$("#project_list").val()];
+	var this_proj   = master.project_mgmt.projects[$("#project_list").val()];
 
 	update_dropdown_lists();
   stim_file = Object.keys(this_proj.all_stims)[0];
@@ -337,7 +272,7 @@ function update_handsontables(){
 												 sheet_type,
 												 sheet_name);
 		} else {
-      var sheet_json = master_json.project_mgmt
+      var sheet_json = master.project_mgmt
 																	.projects[project]
 																	[project_mgmt_location];
 			createExpEditorHoT(sheet_json,
@@ -355,7 +290,7 @@ function update_handsontables(){
 
 			 if(conditions_sheet == ""){
 				 conditions_sheet = Papa.unparse(
-           master_json
+           master
              .project_mgmt
              .projects
              [$("#project_list").val()]
@@ -376,7 +311,7 @@ function update_handsontables(){
       );
 		  if(stim_sheet == ""){
 				 stim_sheet = Papa.unparse(
-           master_json
+           master
              .project_mgmt
              .projects
              [$("#project_list").val()]
@@ -397,7 +332,7 @@ function update_handsontables(){
        );
 			 if(proc_sheet == ""){
 				 proc_sheet = Papa.unparse(
-           master_json
+           master
             .project_mgmt
             .projects
             [$("#project_list").val()]
@@ -419,19 +354,8 @@ function update_handsontables(){
         break;
 
   }
-	$("#dropbox_inputs").show();
+	$("#project_inputs").show();
 }
-function update_master_json(){
-	dbx_obj.new_upload({path:"/master.json",
-                      contents:JSON.stringify(master_json,null,2),
-                      mode:'overwrite'},
-                      function(result){
-
-	},function(error){
-		bootbox.alert(error.error + "<br> Perhaps wait a bit and save again?");
-	},
-	"filesUpload");
-};
 
 
 function upload_exp_contents(these_contents,this_filename){
@@ -439,8 +363,8 @@ function upload_exp_contents(these_contents,this_filename){
 	cleaned_filename = this_filename.toLowerCase().replace(".json","");
 
 	// note that this is a local function. right?
-	function upload_to_master_json(exp_name,this_content) {
-		master_json.project_mgmt.projects[exp_name] = this_content;
+	function upload_to_master(exp_name,this_content) {
+		master.project_mgmt.projects[exp_name] = this_content;
 		list_projects();
     upload_trialtypes(this_content);
     upload_surveys(this_content);
@@ -448,7 +372,7 @@ function upload_exp_contents(these_contents,this_filename){
 	}
   function upload_surveys(this_content){
     function unique_survey(suggested_name,survey_content){
-      all_surveys = Object.keys(master_json.surveys.user_surveys).concat(Object.keys(master_json.surveys.default_surveys));
+      all_surveys = Object.keys(master.surveys.user_surveys).concat(Object.keys(master.surveys.default_surveys));
       if(all_surveys.indexOf(suggested_name) !== -1){
         bootbox.prompt("<b>" + suggested_name + "</b> is taken. Please suggest another name, or press cancel if you don't want to save this survey?",function(new_name){
           if(new_name){
@@ -456,7 +380,7 @@ function upload_exp_contents(these_contents,this_filename){
           }
         });
       } else {
-        master_json.surveys.user_surveys[suggested_name] = survey_content;
+        master.surveys.user_surveys[suggested_name] = survey_content;
       }
     }
 
@@ -470,7 +394,7 @@ function upload_exp_contents(these_contents,this_filename){
 		trialtypes.forEach(function(trialtype){
 
       function unique_trialtype(suggested_name,trialtype_content){
-        all_trialtypes = Object.keys(master_json.code.user).concat(Object.keys(master_json.code.default));
+        all_trialtypes = Object.keys(master.code.user).concat(Object.keys(master.code.default));
         if(all_trialtypes.indexOf(suggested_name) !== -1){
           bootbox.prompt("<b>" + suggested_name + "</b> is taken. Please suggest another name, or press cancel if you don't want to save this trialtype?",function(new_name){
             if(new_name){
@@ -478,7 +402,7 @@ function upload_exp_contents(these_contents,this_filename){
             }
           });
         } else {
-          master_json.code.user[suggested_name] = trialtype_content;
+          master.code.user[suggested_name] = trialtype_content;
           list_code();
         }
       }
@@ -496,27 +420,27 @@ function upload_exp_contents(these_contents,this_filename){
 		callback: function(exp_name){
       if(exp_name){
         function unique_experiment(suggested_name,content){
-          all_experiments = Object.keys(master_json.project_mgmt.projects);
+          all_experiments = Object.keys(master.project_mgmt.projects);
           if(all_experiments.indexOf(suggested_name) !== -1){
             bootbox.prompt("<b>" + suggested_name + "</b> is taken. Please suggest another name, or press cancel if you don't want to save this experiment?",function(new_name){
               if(new_name){
                 unique_experiment(new_name,content);
               } else {
-                upload_to_master_json(exp_name,parsed_contents);
+                upload_to_master(exp_name,parsed_contents);
 								$("#save_btn").click();
               }
             });
           } else {
-            master_json.project_mgmt.projects[suggested_name] = content;
+            master.project_mgmt.projects[suggested_name] = content;
             list_projects();
             $("#upload_experiment_modal").hide();
-            upload_to_master_json(exp_name,parsed_contents);
+            upload_to_master(exp_name,parsed_contents);
 						$("#save_btn").click();
           }
         }
         unique_experiment(exp_name,parsed_contents);
       } else {
-        upload_to_master_json(exp_name,parsed_contents);
+        upload_to_master(exp_name,parsed_contents);
 				$("#save_btn").click();
       }
 		}

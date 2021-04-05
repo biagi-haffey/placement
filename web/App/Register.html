@@ -81,7 +81,6 @@
 <script>
 
 $("#add_server").on("click",function(){
-  //resume here
   var this_server_info = {
     storage_url      : '',
     registration_url : '',
@@ -95,15 +94,15 @@ $("#add_server").on("click",function(){
         bootbox.prompt("What will you call this server?",function(server_name){
           if(server_name){
             this_server_info.name = server_name;
-            if(typeof(master_json.data.servers[server_name]) !== "undefined"){
+            if(typeof(master.data.servers[server_name]) !== "undefined"){
               bootbox.confirm("You already have a server called <b>" + server_name + "</b> - do you want to override it?", function(result){
-                master_json.data.servers[this_server_info.name] = {
+                master.data.servers[this_server_info.name] = {
                   storage_url      : this_server_info.url,
                   registration_url : this_server_info.registration_url
                 }
               });
             } else {
-              master_json.data.servers[this_server_info.name] = {
+              master.data.servers[this_server_info.name] = {
                 storage_url      : this_server_info.url,
                 registration_url : this_server_info.registration_url
               }
@@ -129,7 +128,7 @@ $("#sos_server_query").on("click",function(){
       var storage_scripts      = updated_server_info.storage_scripts.split(",");
 
       server_names.forEach(function(server_name,this_index){
-        master_json.data.servers[server_name] = {
+        master.data.servers[server_name] = {
           server           : server_name,
           registration_url : registration_scripts[this_index],
           storage_url      : storage_scripts[this_index]
@@ -207,7 +206,7 @@ function bind_delete_server_btns(){
 
     //find span
     var server_name = $(this).find("span")[0].innerHTML;
-    delete(master_json.data.servers[server_name]);
+    delete(master.data.servers[server_name]);
     list_servers();
   });
 }
@@ -248,7 +247,7 @@ function bind_unpublish_btn(){
 		} else {																														// if all good
 			var register_url = $(this).find("span")[0].innerHTML;
 			var project = $("#project_list").val();
-			var this_proj   = master_json.project_mgmt.projects[project];
+			var this_proj   = master.project_mgmt.projects[project];
 			$.post(register_url,{
 				location:               this_proj.location,
 				experiment:             experiment,
@@ -286,7 +285,7 @@ function publish_experiment(
 																 "created this experiment"){
 						var server_name;
 						var storage_url;
-            var server_info = master_json.data.servers;
+            var server_info = master.data.servers;
             Object.keys(server_info).forEach(function(this_server_name){
               console.dir(this_server_name);
               if(server_info[this_server_name].registration_url == register_url){
@@ -295,7 +294,7 @@ function publish_experiment(
               }
             });
 						var project = $("#project_list").val();
-						var this_proj   = master_json.project_mgmt.projects[project];
+						var this_proj   = master.project_mgmt.projects[project];
 
             if(typeof(this_proj.storage_scripts) == "undefined"){
 							this_proj.storage_scripts = {};
@@ -324,77 +323,57 @@ function bind_publish_btn(){
 		} else {
 			var register_url = $(this).find("span")[0].innerHTML;
 			var project = $("#project_list").val();
-			var this_proj   = master_json.project_mgmt.projects[project];
+			var this_proj   = master.project_mgmt.projects[project];
 
 			/*
 				Identify the experiment location
 			*/
-			switch(Collector.detect_context()){
-				case "github":                                                  // i.e. the experiment is on dropbox
-				case "gitpod":                                                  // i.e. the experiment is on dropbox
-				case "server":                                                  // i.e. the experiment is on dropbox
-					publish_experiment(this_proj,                                  // object with location
-														 experiment,																// experiment name
-														 register_url)
-					break;
-				case "localhost":
 
-          // i.e. the experiment is on github
-					if(typeof(github_json) == "undefined"){
-						github_json = {};
-					}
-					if(typeof(github_json.organization) == "undefined"){
-            alert("ho");
-						github_json.organization = '';
-					}
-					if(typeof(github_json.repository) == "undefined"){
-						github_json.repository = '';
-					}
-					if(typeof(github_json.username) == "undefined"){
-						github_json.username = '';
-					}
-					if(github_json.repository == ""){
-						bootbox.alert("You appear to be using an installed " +
-						"version of Collector rather than an online version. " +
-						"You will need to identify which github repository " +
-						"you want to push your experiments to before you can " +
-						"register this experiment. To do this, click on the " +
-						"github button in the top right of the page.");
-					} else if(github_json.organization == "" &&
-										github_json.username == ""){
-						bootbox.alert("You appear to be using an installed " +
-						"version of Collector rather than an online version. " +
-						"You will need to identify which github user " +
-						"or organsation you are using on github before you can " +
-						"register this experiment. To do this, click on the " +
-						"github button in the top right of the page.");
-					} else {
-
-						if(github_json.organization !== ""){
-							var github_user_org = github_json.organization;
-						}	else {
-							var github_user_org = github_json.username;
-						}
-
-						this_proj.location = github_user_org        + "/" +
-																github_json.repository + "/" +
-                                experiment;
-						publish_experiment(
-              this_proj,
-              experiment,
-              register_url
-            );
-					}
-					break;
+      if(typeof(github_json) == "undefined"){
+				github_json = {};
 			}
+			if(typeof(github_json.organization) == "undefined"){
+        master.github.organization = '';
+			}
+			if(typeof(github_json.repository) == "undefined"){
+				master.github.repository = '';
+			}
+			if(typeof(github_json.username) == "undefined"){
+				github_json.username = '';
+			}
+			if(master.github.repository == "" | master.github.organization == "" && github_json.username == ""){
+				bootbox.alert("You appear to be using an installed " +
+				"version of Collector rather than an online version. " +
+				"You will need to identify which github repository " +
+				"you want to push your experiments to before you can " +
+				"register this experiment. To do this, click on the " +
+				"github button in the top right of the page.");
+			} else {
+
+				if(master.github.organization !== ""){
+					var github_user_org = github_json.organization;
+				}	else {
+					var github_user_org = github_json.username;
+				}
+
+				this_proj.location = github_user_org        + "/" +
+														 master.github.repository + "/" +
+                             experiment;
+				publish_experiment(
+          this_proj,
+          experiment,
+          register_url
+        );
+			}
+
 		}
 	});
 }
 
 
 function update_server_table(){
-  if(typeof(master_json.data.servers) == "undefined"){
-		master_json.data.servers = {};
+  if(typeof(master.data.servers) == "undefined"){
+		master.data.servers = {};
 	}
 
   var server_table =  "<table class='table'>"+
@@ -406,8 +385,8 @@ function update_server_table(){
                         "</tr>" +
                       "</thead>";
 
-  Object.keys(master_json.data.servers).forEach(function(this_server){
-    var server_row = master_json.data.servers[this_server];
+  Object.keys(master.data.servers).forEach(function(this_server){
+    var server_row = master.data.servers[this_server];
 
     if(server_row.registration_url == "" |
        server_row.registration_url == null){
@@ -480,7 +459,7 @@ function update_server_table(){
 }
 
 function list_servers(){
-  server_info = Object.keys(master_json.data.servers);
+  server_info = Object.keys(master.data.servers);
   update_server_table();
 }
 $("#dismiss_login_btn").on("click",function(){

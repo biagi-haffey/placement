@@ -22,55 +22,34 @@ $.ajaxSetup({ cache: false }); // prevents caching, which disrupts $.get calls
 code_obj = {
 	delete_code:function(){
     var deleted_code = $("#code_select").val();
-    master_json.code.file = $("#code_select").val();
-		var this_loc = "/code/" + master_json.code.file;
+    master.code.file = $("#code_select").val();
+		var this_loc = "/code/" + master.code.file;
 		bootbox.confirm("Are you sure you want to delete this " + this_loc + "?", function(result){
 			if(result == true){
-				if(typeof(master_json.code.graphic.files[master_json.code.file]) !== "undefined"){
-					delete(master_json.code.graphic.files[master_json.code.file]);
+				if(typeof(master.code.graphic.files[master.code.file]) !== "undefined"){
+					delete(master.code.graphic.files[master.code.file]);
 				}
-				delete(master_json.code.user[master_json.code.file]);
+				delete(master.code.user[master.code.file]);
         $("#code_select").attr("previousvalue","");
 				$("#code_select option:selected").remove();
-				master_json.code.file = $("#code_select").val();
+				master.code.file = $("#code_select").val();
 				code_obj.load_file("default");
 				Collector.custom_alert("Successfully deleted "+this_loc);
-				update_master_json();
-
-				switch(Collector.detect_context()){
-					case "github":
-					case "gitpod":
-					case "server":
-            // i.e. the user is online and using dropbox
-						dbx.filesDelete({path:this_loc+".html"})
-							.then(function(returned_data){
-								//do nothing more
-							})
-							.catch(function(error){
-								Collector
-									.tests
-									.report_error("problem deleting a code file",
-														 	  "problem deleting a code file");
-							});
-						break;
-					case "localhost":
-						Collector
-							.electron
-              .fs
-							.delete_code(deleted_code,
-								function(response){
-									if(response !== "success"){
-										bootbox.alert(response);
-									}
-								});
-						break;
-				}
+				Collector
+				  .electron
+          .fs
+					.delete_code(deleted_code,
+						function(response){
+							if(response !== "success"){
+								bootbox.alert(response);
+							}
+						}
+          );
 			}
 		});
 	},
 	load_file:function(user_default){
-    console.log(user_default);
-		$("#ACE_editor").show();
+    $("#ACE_editor").show();
 		$("#new_code_button").show();
 		$("#rename_code_button").show();
 		if(user_default == "default"){
@@ -81,7 +60,7 @@ code_obj = {
 			$("#delete_code_button").show();
 		}
 
-		var this_file = master_json.code.file;
+		var this_file = master.code.file;
 
     //python load if localhost
     switch(Collector.detect_context()){
@@ -94,13 +73,13 @@ code_obj = {
 					cleaned_code
         )
 				if(this_content == ""){
-				  editor.setValue(master_json.code[user_default][this_file]);
+				  editor.setValue(master.code[user_default][this_file]);
         } else {
 				  editor.setValue(this_content);
 		    }
         break;
       default:
-				var content = master_json.code[user_default][this_file];
+				var content = master.code[user_default][this_file];
         editor.setValue(content);
         break;
     }
@@ -131,46 +110,21 @@ code_obj = {
 		} else {
 			Collector.custom_alert("success - " + name + " updated");
 		}
-		dbx_obj.new_upload({path:"/trialtypes/"+name+".html",contents:content,mode:"overwrite"},function(result){
-			Collector.custom_alert("<b>" + name + "updated on dropbox");
-		},function(error){
-			bootbox.alert("error: "+error.error+"<br> try saving again after waiting a little");
-		},
-		"filesUpload");
 		if(typeof(Collector.electron) !== "undefined"){
 			var write_response = Collector.electron.fs.write_file(
-        "Trialtypes",
+        "Code",
 				name
 					.toLowerCase()
 					.replace(".html","") + ".html",
 				content
       )
 			if(write_response !== "success"){
-			     bootbox.alert(result);
+			  bootbox.alert(write_response);
 			}
-		}
-	},
-	synchTrialtypesFolder:function(){
-		if(dropbox_check()){
-			dbx.filesListFolder({path:"/trialtypes"})
-				.then(function(returned_data){
-					var trialtypes = returned_data.entries.filter(item => item[".tag"] == "file");
-					trialtypes.forEach(function(trialtype){
-						trialtype.name = trialtype.name.replace(".html","");
-						if(typeof(master_json.code.user[trialtype.name]) == "undefined"){
-							dbx.sharingCreateSharedLink({path:trialtype.path_lower})
-								.then(function(returned_path_info){
-									$.get(returned_path_info.url.replace("www.","dl."),function(content){
-										master_json.code.user[trialtype.name] = content;
-										$("#code_select").append("<option class='user_code'>"+trialtype.name+"</option>");
-									});
-								});
-						}
-					});
-				});
 		}
 	}
 }
+
 function list_code(to_do_after){
 	//try{
 		if(typeof(Collector.electron) !== "undefined"){
@@ -178,8 +132,8 @@ function list_code(to_do_after){
       files = JSON.parse(files);
       files = files.map(item => item.replaceAll(".html",""));
       files.forEach(function(file){
-        if(Object.keys(master_json.code.user).indexOf(file) == -1){
-          master_json.code.user[file] = Collector
+        if(Object.keys(master.code.user).indexOf(file) == -1){
+          master.code.user[file] = Collector
             .electron
             .fs
             .read_file("Code", file + ".html");
@@ -194,9 +148,9 @@ function list_code(to_do_after){
       $("#code_select").val("Select a file");
 
       var default_code = JSON.parse(returned_data);
-      var user = master_json.code.user;
+      var user = master.code.user;
 
-      master_json.code.default = default_code;
+      master.code.default = default_code;
       default_keys = Object.keys(default_code).sort((a, b) => a.localeCompare(b, undefined, {sensitivity: 'base'}));
 
       user_keys = Object.keys(user).sort((a, b) => a.localeCompare(b, undefined, {sensitivity: 'base'}));
@@ -204,24 +158,14 @@ function list_code(to_do_after){
       default_keys.forEach(function(element){
         $("#code_select").append("<option class='default_code'>"+element+"</option>");
       });
-      master_json.code.user = user;
+      master.code.user = user;
 
       user_keys.forEach(function(element){
         $("#code_select").append("<option class='user_code'>" + element + "</option>");
       });
-      code_obj.synchTrialtypesFolder();
-
-
-      switch(Collector.detect_context()){
-        case "server":
-        case "gitpod":
-        case "github":
-				case "localhost":
-          // currently do nothing
-          if(typeof(to_do_after) !== "undefined"){
-            to_do_after();
-          }
-          break;
+      
+      if(typeof(to_do_after) !== "undefined"){
+        to_do_after();
       }
     }
 
@@ -235,15 +179,14 @@ function list_code(to_do_after){
               "Code",
               item
             );
-            console.log(trial_content);
-            master_json.code.default[
+            master.code.default[
               item.toLowerCase().replace(".html","")
             ] = trial_content;
             get_default(list);
             break;
           default:
               $.get(collector_map[item],function(trial_content){
-                master_json.code.default[
+                master.code.default[
                   item.toLowerCase().replace(".html","")
                 ] = trial_content;
                 get_default(list);
@@ -252,10 +195,10 @@ function list_code(to_do_after){
           }
 
       } else {
-        process_returned(JSON.stringify(master_json.code.default));
+        process_returned(JSON.stringify(master.code.default));
       }
     }
-    var default_list = Object.keys(isolation_map[".."]["Default"]["DefaultTrialtypes"]);
+    var default_list = Object.keys(isolation_map[".."]["Default"]["DefaultPhasetypes"]);
 
     get_default(default_list);
 

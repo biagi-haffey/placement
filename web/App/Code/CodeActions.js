@@ -41,10 +41,10 @@ function initiate_actions(){
         "end_checks_experiment"
       ];
 
-      if(quality_checks.indexOf(this_name)){
+      if(quality_checks.indexOf(this_name) !== -1){
         bootbox.alert("<b>" +
           this_name + "</b>" +
-          "is protected, please choose another name"
+          " is protected, please choose another name"
         );
         return false;
       } else {
@@ -54,8 +54,8 @@ function initiate_actions(){
       return false;
     }
 
-    var current_code = Object.keys(master_json.code.user)
-      .concat(Object.keys(master_json.code.default));
+    var current_code = Object.keys(master.code.user)
+      .concat(Object.keys(master.code.default));
     current_code = Array.from(new Set(current_code));
     if(current_code.indexOf(this_name.toLowerCase()) == -1){
       return true;
@@ -66,14 +66,14 @@ function initiate_actions(){
   }
   $("#ACE_editor").on("keyup input",function(){
     var ace_content = editor.getValue();
-    var code_file   = master_json.code.file;
-    if(typeof(master_json.code.user[code_file]) == "undefined"){
-      master_json.code.user[code_file] = {
+    var code_file   = master.code.file;
+    if(typeof(master.code.user[code_file]) == "undefined"){
+      master.code.user[code_file] = {
         files : {}
       }
     }
-    master_json.code.user[code_file].updated = true;
-    master_json.code.user[code_file]= ace_content;
+    master.code.user[code_file].updated = true;
+    master.code.user[code_file]= ace_content;
   });
 
   $("#delete_code_button").on("click",function(){
@@ -98,15 +98,13 @@ function initiate_actions(){
           className: 'btn-primary',
           callback: function(){
             var new_name = $("#new_code_name").val().toLowerCase();
-            if(valid_trialtype(new_name)){
-              content = "";
-              if(protected_name_check(new_name)){
-                if(valid_new_name(new_name)){
-                  master_json.code.user[new_name] = content;
-                  master_json.code.file = new_name;
-                  code_obj.save(content,new_name,"new","code");
-                  editor.textInput.getElement().onkeydown = "";
-                }
+            if(protected_name_check(new_name)){
+              if(valid_new_name(new_name)){
+                var content = "";
+                master.code.user[new_name] = content;
+                master.code.file = new_name;
+                code_obj.save(content,new_name,"new","code");
+                editor.textInput.getElement().onkeydown = "";
               }
             }
           }
@@ -119,24 +117,24 @@ function initiate_actions(){
               if(protected_name_check(new_name)){
                 if(valid_new_name(new_name)){
                   content = "";
-                  master_json.code.user[new_name] = content;
-                  master_json.code.file = new_name;
+                  master.code.user[new_name] = content;
+                  master.code.file = new_name;
                   code_obj.save(content,new_name,"new","graphic");
                   $("#graphic_editor").show();
                   editor.setOption("readOnly",true);
                   editor.textInput.getElement().onkeydown = graphic_editor_obj.graphic_warning;
-                  master_json.code.graphic.files[new_name] = {
+                  master.code.graphic.files[new_name] = {
                     elements: {}
                   };
-                  master_json.code.graphic.files[new_name].width = "600";
-                  master_json.code.graphic.files[new_name].height = "600";
-                  master_json.code.graphic.files[new_name]["background-color"] = "white";
-                  master_json.code.graphic.files[new_name].mouse_visible = true;
-                  master_json.code.graphic.files[new_name].keyboard = {
+                  master.code.graphic.files[new_name].width = "600";
+                  master.code.graphic.files[new_name].height = "600";
+                  master.code.graphic.files[new_name]["background-color"] = "white";
+                  master.code.graphic.files[new_name].mouse_visible = true;
+                  master.code.graphic.files[new_name].keyboard = {
                     valid_keys: '',
                     end_press: true
                   };
-                  master_json.code.file = new_name;
+                  master.code.file = new_name;
                   graphic_editor_obj.update_main_settings();
                   graphic_editor_obj.clean_canvas();
 
@@ -155,75 +153,54 @@ function initiate_actions(){
         }
       }
     })
-      .off("shown.bs.modal")
-      .on("shown.bs.modal", function() {
-        $("#new_code_name").focus();
-      })
-      .modal("show");
+    .off("shown.bs.modal")
+    .on("shown.bs.modal", function() {
+      $("#new_code_name").focus();
+    })
+    .modal("show");
   });
 
   $("#rename_code_button").on("click",function(){
     var trialtype_selected = $("#code_select").val();
 
-    if(typeof(master_json.code.default[trialtype_selected]) !== "undefined"){
+    if(typeof(master.code.default[trialtype_selected]) !== "undefined"){
       bootbox.alert("You can't rename a default trialtype");
     } else {
-      bootbox.prompt("What would you like to rename the Trialtype to?",function(new_name){
+      bootbox.prompt("What would you like to rename the Phasetype to?",function(new_name){
         if(new_name == null){
           // close the window
         } else if($("#code_select").text().indexOf(new_name) !== -1){
           bootbox.alert("You already have a trialtype with this name");
         } else {
           var original_name = $("#code_select").val();
-          master_json.code.user[new_name] = master_json.code.user[original_name];
-          delete(master_json.code.user[original_name]);
+          master.code.user[new_name] = master.code.user[original_name];
+          delete(master.code.user[original_name]);
 
           $("#code_select").attr("previousvalue","");
 
-          switch(Collector.detect_context()){
-            case "github":
-            case "github":
-            case "server":
-              dbx.filesMove({
-                from_path: "/trialtypes/" + original_name + ".html",
-                to_path:   "/trialtypes/" + new_name +      ".html"
-              })
-              .then(function(result){
-                update_master_json();
-                list_code(function(){
-                  $("#code_select").val(new_name);
-                  $("#code_select").change();
-                });
-              })
-              .catch(function(error){
-                Collector.tests.report_error("problem moving an experiment", "problem moving an experiment");
-              });
 
-            case "localhost":
-              var response = Collector.electron.fs.write_file(
-                "Trialtypes",
-                new_name.replace(".html","") + ".html",
-                master_json
-                  .trialtypes
-                  .user
-                  [new_name])
-              if(write_response == "success"){
-                Collector.electron.fs.delete_code(
-                    original_name,
-                    function(response){
-                      if(response == "success"){
-                        update_master_json();
-                        list_code(function(){
-                          $("#code_select").val(new_name);
-                          $("#code_select").change();
-                        });
-                      } else {
-                        bootbox.alert(response);
-                      }
-                    }
-                  )
+          var response = Collector.electron.fs.write_file(
+            "Phasetypes",
+            new_name.replace(".html","") + ".html",
+            master
+              .trialtypes
+              .user
+              [new_name]
+          )
+          if(write_response == "success"){
+            Collector.electron.fs.delete_code(
+              original_name,
+              function(response){
+                if(response == "success"){
+                  list_code(function(){
+                    $("#code_select").val(new_name);
+                    $("#code_select").change();
+                  });
+                } else {
+                  bootbox.alert(response);
                 }
-              break;
+              }
+            )
           }
         }
       });
@@ -233,7 +210,7 @@ function initiate_actions(){
     if($("#code_select").val() !== null){
       var content = editor.getValue()
       var name  = $("#code_select").val();
-      if(typeof(master_json.code.default[name]) == "undefined"){
+      if(typeof(master.code.default[name]) == "undefined"){
         code_obj.save(content,name,"old");
       } else {
         Collector.custom_alert("You cannot overwrite default trialtypes. Would you like to create a new trialtype? Copy the code from <b>" + name + "</b> to a new trialtype if you want to make changes");
@@ -243,17 +220,17 @@ function initiate_actions(){
   $("#code_select").on("change",function(){
     var old_code = ($(this).attr('previousValue'));
     if(old_code !== "" &
-      Object.keys(master_json.code.default).indexOf(old_code) == -1){ code_obj.save(master_json.code.user[old_code],old_code,"old");
+      Object.keys(master.code.default).indexOf(old_code) == -1){ code_obj.save(master.code.user[old_code],old_code,"old");
     }
     $(this).attr('previousValue', this.value);
     var code_file = this.value;
 
-    if(typeof(master_json.code.graphic.files[code_file]) !== "undefined"){
-      master_json.code.file = code_file;
+    if(typeof(master.code.graphic.files[code_file]) !== "undefined"){
+      master.code.file = code_file;
       editor.textInput.getElement().onkeydown = graphic_editor_obj.graphic_warning;
 
       //clear canvas
-      graphic_editor_obj.load_canvas(master_json.code.graphic.files[code_file].elements);
+      graphic_editor_obj.load_canvas(master.code.graphic.files[code_file].elements);
       graphic_editor_obj.clean_canvas();
 
       load_trialtype_mods();
@@ -273,10 +250,10 @@ function initiate_actions(){
 
       editor.textInput.getElement().onkeydown = "";
       $("#ACE_editor").show();
-      master_json.code.file = code_file;
+      master.code.file = code_file;
 
 
-      if(typeof(master_json.code.default[code_file]) == "undefined"){
+      if(typeof(master.code.default[code_file]) == "undefined"){
         user_default = "user";
       } else {
         user_default = "default";
@@ -289,7 +266,6 @@ function initiate_actions(){
       } else {
         $("#code_select").addClass("default_trialtype");
       }
-
       code_obj.load_file(user_default);
     }
   });
@@ -306,8 +282,8 @@ function initiate_actions(){
     }
   });
   $("#view_graphic_btn").on("click",function(){
-    var trialtype = master_json.code.file;
-    if(typeof(master_json.code.graphic.files[trialtype]) == "undefined"){
+    var trialtype = master.code.file;
+    if(typeof(master.code.graphic.files[trialtype]) == "undefined"){
       bootbox.alert("This trialtype was not created using the graphic editor, so cannot be edited with it");
     } else {
       if($("#view_graphic_btn").hasClass("btn-primary")){  // then hide

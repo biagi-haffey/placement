@@ -28,45 +28,28 @@ $("#delete_exp_btn").on("click",function(){
 	if(exp_name == null){
 		bootbox.alert("You need to select a study to delete it");
 	} else {
-		bootbox.confirm("Are you sure you want to delete your experiment? <br><br> If you delete it you can go to your <a href='https://www.dropbox.com/home/Apps/Collector-SOS' target='blank'>dropbox folder</a> to look up previous versions of your study.", function(result) {
+		bootbox.confirm("Are you sure you want to delete your experiment?", function(result) {
 			if(result){
-				//delete from master_json
-				delete (master_json.project_mgmt.projects[exp_name]);
-				if(dropbox_check()){
-					dbx.filesDelete({path:"/experiments/"+exp_name+".json"})
-						.then(function(response) {
-              $('#project_list option:contains('+ exp_name +')')[0].remove();
-							if(document.getElementById('project_list').options[0] !== undefined){
-								$("#project_list").val(document.getElementById('project_list').options[1].value);
-							}
-							Collector.custom_alert(exp_name + " succesfully deleted");
-							update_master_json();
-							$("#save_btn").click();
-							update_handsontables();
-						})
-						.catch(function(error) {
-							Collector.tests.report_error("problem deleting an experiment", "problem deleting an experiment");
-						});
-				} else {
-					$('#project_list option:contains('+ exp_name +')')[0].remove();
-					$("#project_list").val(document.getElementById('project_list').options[1].value);
-					Collector.custom_alert(exp_name +" succesfully deleted");
-					update_master_json();
-					update_handsontables();
+				//delete from master
+				delete (master.project_mgmt.projects[exp_name]);
 
-					//delete the local file if this is
-					if(Collector.detect_context() == "localhost"){
-						Collector
-							.electron
-              .fs
-							.delete_experiment(exp_name,
-								function(response){
-									if(response !== "success"){
-										bootbox.alert(response);
-									}
+				$('#project_list option:contains('+ exp_name +')')[0].remove();
+				$("#project_list").val(document.getElementById('project_list').options[1].value);
+				Collector.custom_alert(exp_name +" succesfully deleted");
+				update_handsontables();
+
+				//delete the local file if this is
+				if(Collector.detect_context() == "localhost"){
+					Collector
+						.electron
+            .fs
+						.delete_experiment(exp_name,
+							function(response){
+								if(response !== "success"){
+									bootbox.alert(response);
 								}
-						);
-					}
+							}
+					);
 				}
 			}
 		});
@@ -83,19 +66,19 @@ $("#delete_proc_button").on("click",function(){
         // do nothing
       } else {
         /*
-        * delete from master_json
+        * delete from master
         */
         var project = $("#project_list").val();
         var proc_file  = $("#proc_select").val();
         delete(
-          master_json
+          master
             .project_mgmt
             .projects
             [project]
             .all_procs[proc_file]
         );
         delete(
-          master_json
+          master
             .project_mgmt
             .projects
             [project]
@@ -103,7 +86,7 @@ $("#delete_proc_button").on("click",function(){
         );
 
         delete(
-          master_json
+          master
             .project_mgmt
             .projects
             [project]
@@ -146,12 +129,12 @@ $("#delete_stim_button").on("click",function(){
         // do nothing
       } else {
         /*
-        * delete from master_json
+        * delete from master
         */
         var project = $("#project_list").val();
         var stim_file  = $("#stim_select").val();
         delete(
-          master_json
+          master
             .project_mgmt
             .projects
             [project]
@@ -159,7 +142,7 @@ $("#delete_stim_button").on("click",function(){
         );
 
         delete(
-          master_json
+          master
             .project_mgmt
             .projects
             [project]
@@ -195,42 +178,35 @@ $("#delete_stim_button").on("click",function(){
 
 $("#download_project_button").on("click",function(){
 	var project = $("#project_list").val();
-	var exp_json = master_json.project_mgmt.projects[project];
+	var project_json = master.project_mgmt.projects[project];
 	var default_filename = project + ".json";
 	bootbox.prompt({
 		title: "What do you want to save this file as?",
 		value: default_filename, //"data.csv",
 		callback:function(result){
 			if(result){
-				Collector.download_file(result,JSON.stringify(exp_json),"json");
+				Collector.download_file(result,JSON.stringify(project_json),"json");
 			}
 		}
 	});
 });
 
 $("#project_list").on("change",function(){
-  if(typeof(first_load) == "undefined" ||
-     first_load	== false){
-     $("#save_btn").click();
-  } else {
-    remove_from_list("Select a dropbox experiment");
-    first_load = false;
-  }
-  exp_json = master_json.project_mgmt.projects[this.value];
+  project_json = master.project_mgmt.projects[this.value];
   clean_conditions();
-  $("#dropbox_inputs").show();
+  $("#project_inputs").show();
   update_handsontables();
   update_server_table();
   $("#save_btn").click();
 });
 
-$("#new_experiment_button").on("click",function(){
+$("#new_project_button").on("click",function(){
 	bootbox.prompt("What would you like to name the new experiment?",function(result){
 		if(result !== null){
 			if($("#project_list").text().indexOf(result) !== -1){
 				bootbox.alert("You already have an experiment with this name");
 			} else {
-				new_experiment(result);
+				new_project(result);
 				$("#save_btn").click();
 			}
 		}
@@ -241,7 +217,7 @@ $("#new_proc_button").on("click",function(){
   var proc_template = default_experiment.all_procs["procedure_1.csv"];
 	bootbox.prompt("What would you like the name of the new <b>procedure</b> sheet to be?",function(new_proc_name){
 		var project = $("#project_list").val();
-		var this_proj   = master_json.project_mgmt.projects[project];
+		var this_proj   = master.project_mgmt.projects[project];
 		var current_procs = Object.keys(this_proj.all_procs);
 		if(current_procs.indexOf(new_proc_name) !== -1){
 			bootbox.alert("You already have a procedure sheet with that name");
@@ -265,7 +241,7 @@ $("#new_stim_button").on("click",function(){
 	var stim_template = default_experiment.all_stims["stimuli_1.csv"];
 	bootbox.prompt("What would you like the name of the new <b>Stimuli</b> sheet to be?",function(new_sheet_name){
 		var project = $("#project_list").val();
-		var this_proj   = master_json.project_mgmt.projects[project];
+		var this_proj   = master.project_mgmt.projects[project];
 		var current_stims = Object.keys(this_proj.all_stims);
 		if(current_stims.indexOf(new_sheet_name) !== -1){
 			bootbox.alert("You already have a <b>Stimuli</b> sheet with that name");
@@ -294,7 +270,7 @@ $("#new_stim_button").on("click",function(){
 
 $("#proc_select").on("change",function(){
 	var project = $("#project_list").val();
-	var this_proj   = master_json.project_mgmt.projects[project];
+	var this_proj   = master.project_mgmt.projects[project];
 	createExpEditorHoT(
     this_proj.all_procs[this.value],
     "procedure",
@@ -309,64 +285,35 @@ $("#rename_exp_btn").on("click",function(){
   			bootbox.alert("You already have an experiment with this name");
   		} else { //proceed
   			var original_name = $("#project_list").val();
-        master_json.project_mgmt.projects[new_name] = master_json.project_mgmt.projects[original_name];
-        delete(master_json.project_mgmt.projects[original_name]);
+        master.project_mgmt.projects[new_name] = master.project_mgmt.projects[original_name];
+        delete(master.project_mgmt.projects[original_name]);
 
-        switch(Collector.detect_context()){
-          case "localhost":
-  					Collector
-  						.electron
-              .fs
-  						.write_project(
-  							new_name,
-    						JSON.stringify(
-  								master_json.project_mgmt.projects[new_name],
-  								null,
-  								2
-  							),
-  							function(response){
-  								if(response == "success"){
-  									Collector
-  										.electron
-                      .fs
-  										.delete_experiment(
-  											original_name,
-  											function(response){
-  												if(response == "success"){
-  													update_master_json();
-  								          list_projects();
-  								          $("#project_list").val(new_name);
-  								          $("#project_list").change();
-  												} else {
-  													bootbox.alert(response);
-  												}
-  											}
-  										)
-  								} else {
-  									bootbox.alert(response);
-  								}
-  							}
-  						);
-            break;
-        }
-        if(typeof(dbx) !== "undefined"){
-          dbx.filesMove({
-            from_path: "/Projects/" +
-                         original_name +
-                         ".json",
-            to_path:  "/Projects/" +
-                        new_name +
-                        ".json"
-          })
-            .then(function(result){
-  						update_master_json();
-  						list_projects();
-  						$("#project_list").val(new_name);
-            })
-            .catch(function(error){
-              Collector.tests.report_error("problem moving an experiment", "problem moving an experiment");
-            });
-        }
+				Collector.electron.fs.write_project(
+					new_name,
+					JSON.stringify(
+						master.project_mgmt.projects[new_name],
+						null,
+						2
+					),
+					function(response){
+						if(response == "success"){
+						Collector.electron.fs.delete_experiment(
+								original_name,
+								function(response){
+									if(response == "success"){
+										list_projects();
+					          $("#project_list").val(new_name);
+					          $("#project_list").change();
+									} else {
+										bootbox.alert(response);
+									}
+								}
+							)
+						} else {
+							bootbox.alert(response);
+						}
+					}
+				);
   		}
     }
 	});
@@ -377,7 +324,7 @@ $("#rename_proc_button").on("click",function(){
     if(new_proc_name){
       new_proc_name = new_proc_name.toLowerCase();
   		var project = $("#project_list").val();
-  		var this_proj   = master_json.project_mgmt.projects[project];
+  		var this_proj   = master.project_mgmt.projects[project];
   		var current_procs = Object.keys(this_proj.all_procs);
   		var current_proc = $("#proc_select").val();
   		    current_procs.splice(current_procs.indexOf(current_proc), 1);
@@ -387,9 +334,9 @@ $("#rename_proc_button").on("click",function(){
   			bootbox.alert("You already have a procedure sheet with that name");
   		} else {
   			new_proc_name = new_proc_name.replace(".csv","") + ".csv";
-  			master_json.project_mgmt.projects[project].all_procs[new_proc_name] = current_proc_sheet;
+  			master.project_mgmt.projects[project].all_procs[new_proc_name] = current_proc_sheet;
 
-  			delete(master_json.project_mgmt.projects[project].all_procs[current_proc]);
+  			delete(master.project_mgmt.projects[project].all_procs[current_proc]);
         $("#proc_select").append($('<option>', {
   				text : new_proc_name
   			}));
@@ -410,7 +357,7 @@ $("#rename_stim_button").on("click",function(){
     if(new_sheet_name){
       new_sheet_name = new_sheet_name.toLowerCase();
       var project = $("#project_list").val();
-  		var this_proj   = master_json.project_mgmt.projects[project];
+  		var this_proj   = master.project_mgmt.projects[project];
 
   		var current_stims = Object.keys(this_proj.all_stims);
   		var current_stim = $("#stim_select").val();
@@ -423,9 +370,9 @@ $("#rename_stim_button").on("click",function(){
   		} else {
   			new_sheet_name = new_sheet_name.replace(".csv","") + ".csv";
 
-  			master_json.project_mgmt.projects[project].all_stims[new_sheet_name] = current_stim_sheet;
+  			master.project_mgmt.projects[project].all_stims[new_sheet_name] = current_stim_sheet;
 
-  			delete(master_json.project_mgmt.projects[project].all_stims[current_stim]);
+  			delete(master.project_mgmt.projects[project].all_stims[current_stim]);
 
   			$("#stim_select").append($('<option>', {
   				text : new_sheet_name
@@ -446,9 +393,9 @@ $("#rename_stim_button").on("click",function(){
 
 $("#run_btn").on("click",function(){
 	var project = $("#project_list").val();
-	var exp_json = master_json.project_mgmt.projects[project];
+	var project_json = master.project_mgmt.projects[project];
 	var select_html = '<select id="select_condition" class="custom-select">';
-  var conditions = Collector.PapaParsed(exp_json.conditions);
+  var conditions = Collector.PapaParsed(project_json.conditions);
 	if(typeof(conditions) == "undefined"){
 		conditions = conditions.filter(function(condition){
 			return condition.name !== "";
@@ -459,146 +406,101 @@ $("#run_btn").on("click",function(){
 	});
 	select_html += "</select>";
 
+	if(typeof(master.data.save_script) == "undefined" ||
+		//test here for whether there is a github repository linked
+		master.data.save_script == ""){
 
-
-
-	switch(Collector.detect_context()){
-		case "github":
-		case "server":
-		bootbox.dialog({
-			title:"Select a Condition",
-				message: "Which condition would you like to run? <br><br>" + select_html,
-				buttons: {
-					online: {
-						label: "Online",
-						className: 'btn-primary',
-						callback: function(){
-							master_json.project_mgmt.exp_condition = $("#select_condition").val();
-
-							var this_url = window.location.href.split("/" + Collector.version)[0] +
-																												"/App/";
-							window.open(this_url  	+ "Run.html?platform=github&" +
-													"location=" + $("#project_list").val() + "&" +
-													"name="     + master_json.project_mgmt.exp_condition + "&" +
-													"dropbox="  + exp_json.location,"_blank");
-						}
-					},
-					publish: {
-						label: "Publish",
-						className: 'btn-primary',
-						callback: function(){
-							update_server_table();
-              $("#login_modal").fadeIn();
-						}
-					},
-          cancel: {
-						label: "Cancel",
-						className: 'btn-secondary',
-						callback: function(){
-							//nada;
-						}
-          }
-				}
-			});
-			break;
-		case "localhost":
-			if(typeof(master_json.data.save_script) == "undefined" ||
-				//test here for whether there is a github repository linked
-				master_json.data.save_script == ""){
-
-        /* might reinstate this later if it becomes helpful
-				bootbox.prompt("You currently have no link that saves your data. Please follow the instructions in the tutorial (to be completed), and then copy the link to confirm where to save your data below:",function(this_url){
-					if(this_url){
-						master_json.data.save_script = this_url;
-						$("#save_btn").click();
-					}
-				});
-        */
+    /* might reinstate this later if it becomes helpful
+		bootbox.prompt("You currently have no link that saves your data. Please follow the instructions in the tutorial (to be completed), and then copy the link to confirm where to save your data below:",function(this_url){
+			if(this_url){
+				master.data.save_script = this_url;
+				$("#save_btn").click();
 			}
-      if(typeof(github_json) == "undefined"){
-        try{
-          github_json = JSON.parse(Collector.electron.git.load_master());
-          var organization = github_json.organization;
-          var repository   = github_json.repository;
-        } catch(error){
-          organization = "Your github json seems broken";
-          repository = "";
-        }
-      } else {
-        var organization = github_json.organization;
-        var repository   = github_json.repository;
-      }
-
-      var github_url =  "https://" +
-        organization +
-        ".github.io" + "/" +
-        repository   + "/" +
-        "web"        + "/" +
-        "App"        + "/" +
-        "Run.html?platform=github&" +
-        "location=" +
-        $("#project_list").val() + "&" +
-        "name=" + conditions[0].name;
-
-
-			bootbox.dialog({
-				title:"Select a Condition",
-				message: "Which condition would you like to run? <br><br>" + select_html + "<br><br>Copy the following into a browser:<br>(make sure you've pushed the latest changes and waited 5+ minutes) <input class='form-control' value='" + github_url + "' onfocus='this.select();' id='experiment_url_input'>",
-				buttons: {
-					local:{
-						label: "Run",
-						className: 'btn-primary',
-						callback: function(){
-              window.open("Run.html?platform=localhost&" +
-													"location=" + $("#project_list").val() + "&" +
-													"name=" + $("#select_condition").val(),
-                          "_blank");
-						}
-					},
-					local_preview:{
-						label: "Preview Local",
-						className: 'btn-info',
-						callback: function(){
-							window.open("Run.html?platform=preview&" +
-													"location=" + $("#project_list").val() + "&" +
-													"name=" + $("#select_condition").val(),"_blank");
-						}
-					},
-          online_preview:{
-						label: "Preview Online",
-						className: 'btn-info',
-						callback: function(){
-							window.open("Run.html?platform=onlinepreview&" +
-													"location=" + $("#project_list").val() + "&" +
-													"name=" + $("#select_condition").val(),"_blank");
-						}
-					},
-					cancel: {
-						label: "Cancel",
-						className: 'btn-secondary',
-						callback: function(){
-							//nada;
-						}
-					}
-				}
-			});
-      $("#select_condition").on("change",function(){
-        $("#experiment_url_input").val(
-          "https://"                            +
-            organization                        +
-            ".github.io"                        + "/" +
-            github_json.repository              + "/" +
-            "web"                               + "/" +
-            "App"                               + "/" +
-            "Run.html?platform=github&"    +
-						"location="                         +
-              $("#project_list").val() + "&" +
-						"name="                             +
-            $("#select_condition").val()
-        );
-      });
-			break;
+		});
+    */
 	}
+  if(typeof(github_json) == "undefined"){
+    try{
+      github_json = JSON.parse(Collector.electron.git.load_master());
+      var organization = github_json.organization;
+      var repository   = github_json.repository;
+    } catch(error){
+      organization = "Your github json seems broken";
+      repository = "";
+    }
+  } else {
+    var organization = github_json.organization;
+    var repository   = github_json.repository;
+  }
+
+  var github_url =  "https://" +
+    organization +
+    ".github.io" + "/" +
+    repository   + "/" +
+    "web"        + "/" +
+    "App"        + "/" +
+    "Run.html?platform=github&" +
+    "location=" +
+    $("#project_list").val() + "&" +
+    "name=" + conditions[0].name;
+
+
+	bootbox.dialog({
+		title:"Select a Condition",
+		message: "Which condition would you like to run? <br><br>" + select_html + "<br><br>Copy the following into a browser:<br>(make sure you've pushed the latest changes and waited 5+ minutes) <input class='form-control' value='" + github_url + "' onfocus='this.select();' id='experiment_url_input'>",
+		buttons: {
+			local:{
+				label: "Run",
+				className: 'btn-primary',
+				callback: function(){
+          window.open("Run.html?platform=localhost&" +
+											"location=" + $("#project_list").val() + "&" +
+											"name=" + $("#select_condition").val(),
+                      "_blank");
+				}
+			},
+			local_preview:{
+				label: "Preview Local",
+				className: 'btn-info',
+				callback: function(){
+					window.open("Run.html?platform=preview&" +
+											"location=" + $("#project_list").val() + "&" +
+											"name=" + $("#select_condition").val(),"_blank");
+				}
+			},
+      online_preview:{
+				label: "Preview Online",
+				className: 'btn-info',
+				callback: function(){
+					window.open("Run.html?platform=onlinepreview&" +
+											"location=" + $("#project_list").val() + "&" +
+											"name=" + $("#select_condition").val(),"_blank");
+				}
+			},
+			cancel: {
+				label: "Cancel",
+				className: 'btn-secondary',
+				callback: function(){
+					//nada;
+				}
+			}
+		}
+	});
+  $("#select_condition").on("change",function(){
+    $("#experiment_url_input").val(
+      "https://"                            +
+        organization                        +
+        ".github.io"                        + "/" +
+        master.github.repository              + "/" +
+        "web"                               + "/" +
+        "App"                               + "/" +
+        "Run.html?platform=github&"    +
+				"location="                         +
+          $("#project_list").val() + "&" +
+				"name="                             +
+        $("#select_condition").val()
+    );
+  });
 
 });
 
@@ -655,7 +557,6 @@ $("#save_btn").on("click", function(){
       return this_proj;
     };
   }
-
   function process_procs(this_proj){
     Object.keys(this_proj.all_procs).forEach(function(proc_name){
       this_proc = Collector.PapaParsed(this_proj.all_procs[proc_name]);
@@ -666,11 +567,11 @@ $("#save_btn").on("click", function(){
         if(typeof(proc_row.survey) !== "undefined" &&
           proc_row.survey !== ""){
           var this_survey = proc_row.survey.toLowerCase();
-          if(typeof(master_json.surveys.user_surveys[this_survey]) !== "undefined"){
+          if(typeof(master.surveys.user_surveys[this_survey]) !== "undefined"){
             if(typeof(this_proj.surveys) == "undefined"){
               this_proj.surveys = {};
             }
-            this_proj.surveys[this_survey] = master_json.surveys.user_surveys[this_survey];
+            this_proj.surveys[this_survey] = master.surveys.user_surveys[this_survey];
 
             //check for mods
             if(typeof(this_proj.mods) == "undefined"){
@@ -678,7 +579,7 @@ $("#save_btn").on("click", function(){
             }
             keyed_survey = Papa.parse(
               Papa.unparse(
-                master_json.surveys.user_surveys[this_survey]
+                master.surveys.user_surveys[this_survey]
               ),
               {
                 header:true
@@ -688,16 +589,16 @@ $("#save_btn").on("click", function(){
               clean_key_row = Collector.clean_obj_keys(key_row);
               if(typeof(clean_key_row.type) !== "undefined"){
                 var survey_mod_type = clean_key_row.type.toLowerCase();
-                if(typeof(master_json.mods[survey_mod_type]) !== "undefined"){
+                if(typeof(master.mods[survey_mod_type]) !== "undefined"){
                   this_proj.mods[survey_mod_type] = {
                     location:'',
-                    contents:master_json.mods[survey_mod_type].contents
+                    contents:master.mods[survey_mod_type].contents
                   }
                 }
               }
             });
-          } else if(typeof(master_json.surveys.default_surveys[this_survey]) !== "undefined"){
-            this_proj.surveys[proc_row.survey] = master_json.surveys.default_surveys[this_survey];
+          } else if(typeof(master.surveys.default_surveys[this_survey]) !== "undefined"){
+            this_proj.surveys[proc_row.survey] = master.surveys.default_surveys[this_survey];
           }	else {
             bootbox.alert("The survey <b>" + proc_row.survey + "</b> in your procedure sheet doesn't appear to exist. Please check the spelling of it");
           }
@@ -717,7 +618,6 @@ $("#save_btn").on("click", function(){
         }
       });
       this_proc = cleaned_parsed_proc.map(function(row, row_index){
-        console.log(row);
         var cleaned_row = Collector.clean_obj_keys(row);
         if(code_files.indexOf(cleaned_row["code"]) == -1){
           code_files.push(cleaned_row["code"].toLowerCase());
@@ -728,10 +628,10 @@ $("#save_btn").on("click", function(){
         }
         if(cleaned_row.item == 0){
 
-          if(typeof(master_json.code.user[cleaned_row["code"]]) !== "undefined"){
-            var this_code = master_json.code.user[cleaned_row["code"]];
-          } else if(typeof(master_json.code.default[cleaned_row["code"]]) !== "undefined"){
-            var this_code = master_json.code.default[cleaned_row["code"]];
+          if(typeof(master.code.user[cleaned_row["code"]]) !== "undefined"){
+            var this_code = master.code.user[cleaned_row["code"]];
+          } else if(typeof(master.code.default[cleaned_row["code"]]) !== "undefined"){
+            var this_code = master.code.default[cleaned_row["code"]];
 
             these_variables = Collector.list_variables(this_code);
 
@@ -769,23 +669,23 @@ $("#save_btn").on("click", function(){
       if(typeof(this_proj.code) == "undefined"){
         this_proj.code = {};
       }
-      if(typeof(master_json.code.user[code_file]) == "undefined"){
-        this_proj.code[code_file] = master_json.code.default[code_file];
+      if(typeof(master.code.user[code_file]) == "undefined"){
+        this_proj.code[code_file] = master.code.default[code_file];
       } else {
-        this_proj.code[code_file] = master_json.code.user[code_file];
+        this_proj.code[code_file] = master.code.user[code_file];
       }
     });
     return this_proj;
   }
 
-  //try{
+  try{
     $("#save_code_button").click();
     $("#save_survey_btn").click();
     $("#save_snip_btn").click();
     $("#save_pathway_btn").click();
 
-    if(typeof(master_json.keys) == "undefined" ||
-       typeof(master_json.keys.public_key) == "undefined"){
+    if(typeof(master.keys) == "undefined" ||
+       typeof(master.keys.public_key) == "undefined"){
          encrypt_obj.generate_keys();
     }
 
@@ -794,10 +694,10 @@ $("#save_btn").on("click", function(){
     * Only try to save an experiment if there is a valid experiment loaded
     */
     if(typeof(project) !== "undefined" & project !== null){
-      var this_proj = master_json.project_mgmt.projects[project];
+      var this_proj = master.project_mgmt.projects[project];
 
       /*
-      * Cleaning the exp_json of deprecated properties
+      * Cleaning the project_json of deprecated properties
       */
       delete(this_proj.conditions_csv);
       delete(this_proj.cond_array);
@@ -814,7 +714,7 @@ $("#save_btn").on("click", function(){
       */
 
       if(typeof(this_proj) !== "undefined"){
-        this_proj.public_key   = master_json.keys.public_key;
+        this_proj.public_key   = master.keys.public_key;
       }
       //parse procs for survey saving next
       if($("#project_list").val() !== null) {
@@ -847,105 +747,62 @@ $("#save_btn").on("click", function(){
         this_proj = process_procs(this_proj);
         this_proj = process_code(this_proj);
 
-        switch(Collector.detect_context()){
-          case "localhost":
-            this_proj.procs_csv = {};
-  					this_proj.stims_csv = {};
+        this_proj.procs_csv = {};
+				this_proj.stims_csv = {};
 
-  					this_proj = JSON.stringify(this_proj, null, 2);
-  					Collector
-  						.electron
-              .fs
-  						.write_project(
-  							project,
-  							this_proj,
-  							function(response){
-  								if(response !== "success"){
-  									bootbox.alert(response);
-  								}
-  							}
-  						)
-              update_master_json();
+				this_proj = JSON.stringify(this_proj, null, 2);
+				Collector.electron.fs.write_project(
+					project,
+					this_proj,
+					function(response){
+						if(response !== "success"){
+							bootbox.alert(response);
+						}
+					}
+				);
 
-
-              var git_json_response = Collector.electron.git.save_master();
-              var write_response = Collector.electron.fs.write_file(
-                "",
-      					"master.json",
-      					JSON.stringify(master_json, null, 2)
-							);
-      			  if(write_response !== "success"){
-      					bootbox.alert(response);
-      				} else {
-                Collector.custom_alert(
-                  "Succesfully saved " +
-                  project
-                )
-              }
-            break;
-          default:
-            dbx_obj.new_upload({path: "/Projects/"+project+".json", contents: JSON.stringify(this_proj), mode:'overwrite'},
-              function(returned_data){
-                dbx.sharingCreateSharedLink({
-                  path:returned_data.path_lower
-                })
-                  .then(function(returned_link){
-                    this_proj.location = returned_link.url;
-                    dbx_obj.new_upload({path: "/Projects/"+project+".json", contents: JSON.stringify(this_proj), mode:'overwrite'},function(location_saved){
-                        $("#run_link").attr("href","../"+ master_json.project_mgmt.version + "/Run.html?location="+this_proj.location);
-                        update_master_json();
-                      },function(error){
-                        Collector.custom_alert("check console for error saving location");
-                        bootbox.alert(error.error + "<br> Perhaps wait a bit and save again?");;
-                      },
-                      "filesUpload");
-                  })
-                  .catch(function(error){
-                    Collector.tests.report_error("problem uploading an experiment", "problem uploading an experiment");
-                  });
-
-              },function(error){
-                alert(error);
-              },
-              "filesUpload");
-            break;
+        var write_response = Collector.electron.fs.write_file(
+          "",
+					"master.json",
+					JSON.stringify(master, null, 2)
+				);
+			  if(write_response !== "success"){
+					bootbox.alert(response);
+				} else {
+          Collector.custom_alert(
+            "Succesfully saved " +
+            project
+          )
         }
       }
-    } else {
-      switch(Collector.detect_context()){
-        case "localhost":
-          var git_json_response = Collector.electron.git.save_master();
-
-          var write_response = Collector.electron.fs.write_file(
-            "",
-            "master.json",
-            JSON.stringify(master_json, null, 2));
-          if(write_response !== "success"){
-            bootbox.alert(response);
-          } else {
-            Collector.custom_alert(
-              "Succesfully saved master_json"
-            )
-          }
-          var git_json_response = Collector.electron.git.save_master();
-      };
+    } else {      
+      var write_response = Collector.electron.fs.write_file(
+        "",
+        "master.json",
+        JSON.stringify(master, null, 2));
+      if(write_response !== "success"){
+        bootbox.alert(response);
+      } else {
+        Collector.custom_alert(
+          "Succesfully saved master"
+        )
+      }
     }
 
     Collector.tests.pass("projects",
                          "save_at_start");
 
-  /*
+
   }  catch (error){
     Collector.tests.fail("projects",
                          "save_at_start",
                          error);
   }
-  */
 });
 
 $("#stim_select").on("change",function(){
 	var project = $("#project_list").val();
-	var this_proj   = master_json.project_mgmt.projects[project];
+	var this_proj   = master.project_mgmt.projects[project];
 	createExpEditorHoT(
     this_proj.all_stims[this.value],
     "stimuli",
@@ -955,7 +812,7 @@ $("#stim_select").on("change",function(){
 
 $("#code_project_select").on("change", function(){
   console.log(this.value);
-  var this_proj = master_json.project_mgmt.projects[this.value];
+  var this_proj = master.project_mgmt.projects[this.value];
   var procs = Object.keys(this_proj.all_procs);
   var stims = Object.keys(this_proj.all_stims);
 
@@ -987,43 +844,5 @@ $("#upload_experiment_input").on("change",function(){
 			upload_exp_contents(e.target.result,this_filename);
 		});
 		reader.readAsBinaryString(myFile);
-	}
-});
-
-$("#versions_btn").on("click",function(){
-	if(typeof($_GET) == "undefined" || typeof($_GET.uid) == "undefined"){
-		bootbox.alert("If you login a dropbox account, it'll automatically backup your experiment files");
-	} else {
-		var project = $("#project_list").val();
-		var version_address = "https://www.dropbox.com/history/Apps/Collector-SOS/experiments/"+experiment+".json?_subject_uid="+ $_GET.uid +"&undelete=1";
-
-		$("#synch_btn").on("click",function(){
-			alert("hi there");
-		});
-
-		var dialog = bootbox.dialog({
-			title: 'Revert back to an earlier version',
-			message: "<p>Click <a href='"+version_address+"' target='_blank'>here</a> to see version history of this file in dropbox<br><br>If you've reverted the current experiment '"+experiment+"' to an earlier version, click on the 'synch' button to load the reverted version of the experiment.</p>",
-			buttons: {
-					synch: {
-							label: "Synch",
-							className: 'btn-primary',
-							callback: function(){
-								$.get(master_json.project_mgmt.projects[project].location.replace("www.","dl."),function(result){
-									master_json.project_mgmt.projects[project] = JSON.parse(result);
-									update_master_json();
-									update_handsontables();
-								});
-							}
-					},
-					cancel: {
-							label: "Cancel",
-							className: 'btn-secondary',
-							callback: function(){
-									//nothing, just close
-							}
-					},
-			}
-    });
 	}
 });

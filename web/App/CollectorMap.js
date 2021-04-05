@@ -27,7 +27,7 @@ var isolation_map = {
         'empathy_quotient_40.csv' : 'file',
   			"info_sheet.csv"					: 'file'
       },
-      DefaultTrialtypes:{
+      DefaultPhasetypes:{
         "instruct.html" :         "file",
   			"instruct_keyboard.html": "file",
         "survey.html":            "file",
@@ -115,8 +115,8 @@ function this_map(this_item){
 
 // Below code is to enable isolated development of surveys code
 
-if(typeof(master_json) == "undefined"){
-  master_json = {
+if(typeof(master) == "undefined"){
+  master = {
     surveys: {
       default_surveys:{},
     },
