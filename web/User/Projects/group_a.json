@@ -42,7 +42,21 @@
         null
       ],
       [
-        "",
+        "agree_info",
+        "I understand these instructions and I am happy to continue",
+        "checkbox",
+        "agree",
+        "agree",
+        "no"
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
         null
       ]
     ]
