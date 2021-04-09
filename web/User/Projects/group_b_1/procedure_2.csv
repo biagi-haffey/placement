@@ -1,0 +1,5 @@
+item,code,max time,text,shuffle 1,survey,
+0,survey,user,,,group_b_info.csv,
+0,instruct,user,"<iframe width=""640"" height=""360"" src=""https://web.microsoftstream.com/embed/video/7ae4fb32-0de2-4cb8-839f-115dd95689e7?autoplay=false&amp;showinfo=true"" allowfullscreen style=""border:none;""></iframe>",off,,
+2,survey,600,,off,group_b_session_1.csv,
+0,instruct,user,,off,,
