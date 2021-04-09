@@ -1,5 +1,4 @@
 item_name,text,type,answers,values,optional,shuffle_question,shuffle_answers,
-Instructions1,<span style='color:#006699'><span style='font-size:20px'>Choose one response that best describes how strongly each item applies to you:</span></span>,instruct,,,,,,
 flashcard_1,1. What is synaesthesia?,radio,"A lack of sensory/cognitive activation in response to a stimulus|A cognitive/sensory condition only affecting children|A response to a stimulus that prompts a secondary involuntary response from another sensory/cognitive pathway
 ",0|0|1,No,,,
 flashcard_2,2. Name three types of synaesthesia,text,,,No,,,

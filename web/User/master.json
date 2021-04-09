@@ -724,17 +724,6 @@
           null
         ],
         [
-          "Instructions1",
-          "<span style='color:#006699'><span style='font-size:20px'>Choose one response that best describes how strongly each item applies to you:</span></span>",
-          "instruct",
-          "",
-          "",
-          "",
-          "",
-          null,
-          null
-        ],
-        [
           "flashcard_1",
           "1. What is synaesthesia?",
           "radio",
@@ -3846,17 +3835,6 @@
               "optional",
               "shuffle_question",
               "shuffle_answers",
-              null
-            ],
-            [
-              "Instructions1",
-              "<span style='color:#006699'><span style='font-size:20px'>Choose one response that best describes how strongly each item applies to you:</span></span>",
-              "instruct",
-              "",
-              "",
-              "",
-              "",
-              null,
               null
             ],
             [
