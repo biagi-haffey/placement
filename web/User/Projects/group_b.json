@@ -187,12 +187,62 @@
         null
       ],
       [
-        "agree_info",
-        "I understand these instructions and I am happy to continue",
+        "info_voluntary",
+        "I understand that my participation in this study is voluntary and that I may withdraw any time without giving any reason.",
         "checkbox",
         "agree",
         "agree",
         "no"
+      ],
+      [
+        "info_read_sheet",
+        "I have read the information sheet about this study and the procedure of the study has been explained to me.",
+        "checkbox",
+        "agree",
+        "agree",
+        "no",
+        null,
+        null
+      ],
+      [
+        "info_ask_question",
+        "I have been given the opportunity to ask any questions that I may have about the study and these have been answered to my satisfaction.",
+        "checkbox",
+        "agree",
+        "agree",
+        "no",
+        null,
+        null
+      ],
+      [
+        "info_understand",
+        "I understand that the data collected from me in this study will be preserved and made available in anonymised form, so that they can be consulted and re-used by others.",
+        "checkbox",
+        "agree",
+        "agree",
+        "no",
+        null,
+        null
+      ],
+      [
+        "insfo_first",
+        "First name",
+        "text",
+        "",
+        "",
+        "no",
+        null,
+        null
+      ],
+      [
+        "info_last",
+        "Last name",
+        "text",
+        "",
+        "",
+        "no",
+        null,
+        null
       ],
       [
         null,
