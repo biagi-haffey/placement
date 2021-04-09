@@ -1437,8 +1437,8 @@
           "Golgi tendon organs|muscles|tendons",
           "",
           "no",
-          "yes",
-          "yes",
+          "",
+          "",
           null
         ],
         [
@@ -1448,8 +1448,8 @@
           "To detect skin stretching. | To detect pressure on the skin. | To detect changes in temperature. | To detect movement",
           "",
           "no",
-          "yes",
-          "yes",
+          "",
+          "",
           null
         ],
         [
@@ -1459,8 +1459,8 @@
           "Primary Sensory Endings. | Secondary Sensory Endings. | Cutaneous Receptors. | Muscle Spindles.",
           "",
           "no",
-          "yes",
-          "yes",
+          "",
+          "",
           null
         ],
         [
@@ -1470,8 +1470,8 @@
           "Least active at extreme angles. |\nThey are rapidly adapting. |\nThey are not very sensitive in signalling precise joint angles. |\nThey are not sensitive to extreme angles. |",
           "",
           "no",
-          "yes",
-          "yes",
+          "",
+          "",
           null
         ],
         [
@@ -1481,8 +1481,8 @@
           "muscle spindles | muscles | sensory endings | gamma motor",
           "",
           "no",
-          "yes",
-          "yes",
+          "",
+          "",
           null
         ],
         [
@@ -1492,8 +1492,8 @@
           "It innovates the intrafusal fibres to match the muscle length. | It innovates the extrafusal fibres to match muscle length. | To detect pressure of the intrafusal fibres. | To detect stretch of the muscle length.",
           "",
           "no",
-          "yes",
-          "yes",
+          "",
+          "",
           null
         ],
         [
@@ -1503,8 +1503,8 @@
           "touch | proprioception | somatosensory cortex | separated",
           "",
           "no",
-          "yes",
-          "yes",
+          "",
+          "",
           null
         ],
         [
@@ -1514,8 +1514,8 @@
           "Secondary sensory endings | tail endings | length",
           "",
           "no",
-          "yes",
-          "yes",
+          "",
+          "",
           null
         ],
         [
@@ -3349,8 +3349,7 @@
               "answers",
               "values",
               "optional",
-              "side_by_side",
-              null
+              ""
             ],
             [
               "Instructions1",
@@ -3359,19 +3358,63 @@
               "",
               "",
               "",
-              "",
-              null
+              ""
             ],
             [
-              "agree_info",
-              "I understand these instructions and I am happy to continue",
+              "info_voluntary",
+              "I understand that my participation in this study is voluntary and that I may withdraw any time without giving any reason.",
               "checkbox",
               "agree",
               "agree",
-              "no"
+              "no",
+              null
             ],
             [
+              "info_read_sheet",
+              "I have read the information sheet about this study and the procedure of the study has been explained to me.",
+              "checkbox",
+              "agree",
+              "agree",
+              "no",
+              null
+            ],
+            [
+              "info_ask_question",
+              "I have been given the opportunity to ask any questions that I may have about the study and these have been answered to my satisfaction.",
+              "checkbox",
+              "agree",
+              "agree",
+              "no",
+              null
+            ],
+            [
+              "info_understand",
+              "I understand that the data collected from me in this study will be preserved and made available in anonymised form, so that they can be consulted and re-used by others.",
+              "checkbox",
+              "agree",
+              "agree",
+              "no",
+              null
+            ],
+            [
+              "insfo_first",
+              "First name",
+              "text",
               null,
+              null,
+              null,
+              null
+            ],
+            [
+              "info_last",
+              "Last name",
+              "text",
+              null,
+              null,
+              null,
+              null
+            ],
+            [
               null,
               null,
               null,
