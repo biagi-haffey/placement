@@ -34,5 +34,5 @@ Project Supervisor: Anthony Haffey <br>
 <br>
 Module convenor: Anthony Haffey (a.haffey@reading.ac.uk)
 ",instruct,,,,,
-agree_info,I understand these instructions and I am happy to continue,checkbox,agree,agree,no
+agree_info,I am happy for my data to be used,checkbox,agree,agree,no
 ,,,,,,,

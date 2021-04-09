@@ -1,3 +1,67 @@
+item_name	text	type	answers	short	elongated	
+1)	Skin receptors can also signal movements, what receptors detect skin stretching?	radio	"Ruffini receptors. 
+| Joint angle receptor. | Movement receptors.|Proprioceptors."	
+
+<br><br>
+The User's answer
+<br><br>
+
+Ruffini receptors is correct	
+
+
+<br><br>
+Elaborated feedback- Skin receptors signal movement of the skin. An example being Ruffini receptors, they detect skin stretch.	
+
+
+
+
+
+
+
+
+						
+
+
+
 <script>
-parent.parent.project_json.all_stims[feedback_questions];
+Phase.set_timer(function(){
+  var survey_response = parent.parent.project_json.responses.filter(function(row){
+    return row.survey == "group_b_session_1.csv";
+  })[0];
+  
+  var these_responses = Object.keys(survey_response).filter(key => key.indexOf("survey_b") !== -1);
+  console.log(these_responses);
+  
+  var _responses = these_responses.filter(key => key.indexOf("_response") !== -1);
+  
+  _responses.forEach(function(_response){
+    console.log(_response);
+    console.log(these_responses.indexOf(_response))
+    //delete(these_responses[these_responses.indexOf(_response)]);
+  });
+  
+  var response_object = {};
+  these_responses.forEach(function(response){
+    var split_response = response.split("_");
+    if(split_response.length == 2){
+      response_object[split_response[1]] = survey_response[response];
+    } else {
+      if(typeof(response_object[split_response[1]]) == "undefined"){
+        response_object[split_response[1]] = [];
+      }
+      response_object[split_response[1]].push(survey_response[response]);
+    }
+  });
+  
+  console.log("response_object");
+  console.log(response_object);
+  
+},100);
+
+
+
+
+
+
+//parent.parent.project_json.all_stims["feedback_questions"];
 </script>
