@@ -16,3 +16,8 @@ If you have any questions do ask the researcher before starting.<br>
 <br>
 You will have 30 minutes to revise the cards.",off,,,
 2,flashcard,1800,This is the start of a new experiment.,off,flashcards_3.csv,,
+0,text,18000,Please come back in 5 or more hours (but leave this tab open!),off,,,
+2,instruct,user,You are about to be asked to complete a test of the knowledge you were learning with flashcards before. You will have 20 minutes to complete these questions.,off,,,
+0,survey,1200,,off,,flashcard_test.csv,
+0,survey,user,,off,,placement_demographics.csv,
+0,survey,user,,off,,group_a_debrief.csv,
