@@ -1,6 +1,6 @@
 {
   "all_procs": {
-    "procedure_1.csv": "item,code,max time,text,shuffle 1,flashcards_sheet,survey,\r\n0,survey,user,,off,,group_c_info.csv,\r\n0,instruct,user,You are about to be presented with some flashcards. You have 20 minutes to learn the content. Note that you and your partner will need to get at least 50% correct on flashcards with a red background.,off,,,\r\n0,flashcard,1200,,off,flashcards2.csv,,\r\n0,text,18000,Please come back in 5 or more hours (but leave this tab open!),off,,,\r\n0,instruct,user,You will now have 15 minutes to complete a test of the knowledge from the earlier flashcards. Please start when you're ready,off,,,\r\n0,survey,900,,off,,groupwork_test.csv,",
+    "procedure_1.csv": "item,code,max time,text,shuffle 1,flashcards_sheet,survey,\r\n0,survey,user,,off,,group_c_info.csv,\r\n0,instruct,user,You are about to be presented with some flashcards. You have 20 minutes to learn the content. Note that you and your partner will need to get at least 50% correct on flashcards with a red background.,off,,,\r\n0,flashcard,1200,,off,flashcards2.csv,,\r\n0,text,18000,Please come back in 5 or more hours (but leave this tab open!),off,,,\r\n0,instruct,user,You will now have 15 minutes to complete a test of the knowledge from the earlier flashcards. Please start when you're ready,off,,,\r\n0,survey,900,,off,,groupwork_test.csv,\r\n0,survey,user,,off,,placement_demographics.csv,",
     "procedure_2.csv": "item,code,max time,text,shuffle 1,flashcards_sheet,survey,\r\n0,survey,user,,off,,group_c_info.csv,\r\n0,instruct,user,You are about to be presented with some flashcards. You have 20 minutes to learn the content. Note that you and your partner will need to get at least 50% correct on flashcards with a red background.,off,,,\r\n0,flashcard,1200,,off,flashcards2.csv,,\r\n0,text,18000,Please come back in 5 or more hours (but leave this tab open!),off,,,\r\n0,instruct,user,You will now have 15 minutes to complete a test of the knowledge from the earlier flashcards. Please start when you're ready,off,,,\r\n0,survey,900,,off,,groupwork_test.csv,"
   },
   "conditions": "name,notes,stimuli,procedure,fullscreen,welcome,participant_id,end_message,start_message,buffer,scripts,\r\ncondition_1,You can put more detailed notes in this field,stimuli_1.csv,procedure_1.csv,off,,on,,,5,,\r\ncondition_2,You can put more detailed notes in this field,stimuli_1.csv,procedure_2.csv,off,,on,,,5,,",
@@ -235,6 +235,139 @@
         "",
         "",
         "",
+        null
+      ],
+      [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    ],
+    "placement_demographics.csv": [
+      [
+        "item_name",
+        "text",
+        "type",
+        "answers",
+        "optional",
+        "values",
+        "side_by_side",
+        "btn_width",
+        null
+      ],
+      [
+        "Gender",
+        "Gender",
+        "likert",
+        "Male|Female|Other",
+        "No",
+        "",
+        "yes",
+        "100px",
+        null
+      ],
+      [
+        "Age",
+        "Age",
+        "number",
+        "",
+        "No",
+        "",
+        "",
+        "",
+        null
+      ],
+      [
+        "Education",
+        "Education (which level are you currently in, or is the highest you've completed)",
+        "dropdown",
+        "Some high school| High school graduate| Some college, no degree| Associate's degree| Bachelor's degree|Graduate degree (Master's, Doctorate, etc.)",
+        "No",
+        "",
+        "",
+        "",
+        null
+      ],
+      [
+        "English_Fluency",
+        "Do you speak English fluently?",
+        "likert",
+        "Yes|No",
+        "No",
+        "",
+        "yes",
+        "200px",
+        null
+      ],
+      [
+        "English_Age",
+        "At what age did you start learning English? (write \"0\" if from birth)",
+        "number",
+        "",
+        "No",
+        "",
+        "",
+        "",
+        null
+      ],
+      [
+        "Country",
+        "What is your country of residence?",
+        "text",
+        "",
+        "No",
+        "",
+        "",
+        "",
+        null
+      ],
+      [
+        "Handedness",
+        "What is your preferred hand?",
+        "likert",
+        "Left|Right|Both",
+        "No",
+        "",
+        "yes",
+        "100px",
+        null
+      ],
+      [
+        "uor_student",
+        "Are you a student at the University of Reading?",
+        "likert",
+        "Yes|No",
+        "No",
+        "",
+        "yes",
+        "200px"
+      ],
+      [
+        "degree_subject",
+        "What degree are you/have you complete(d)? Please write \"none\" if you have not been a university student.",
+        "text",
+        null,
+        "No",
+        null,
+        null,
+        null,
+        null
+      ],
+      [
+        "degree_year",
+        "Can you please confirm how many years you have completed of a BSc degree. For example, if you are a second year student, you would write \"1\".",
+        "text",
+        null,
+        "Yes",
+        null,
+        null,
+        null,
         null
       ],
       [
