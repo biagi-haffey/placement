@@ -1,5 +1,7 @@
 item,code,max time,text,shuffle 1,
-2,instruct,user,"<h4>What is the function of a Ruffini receptor?</h4>
+2,instruct,user,"<h2 class='text-danger'>Do not close this experiment until you get confirmation that your data has been submitted.</h2>
+<h3 class='text-primary'>Here's some clarifications about the previous questions:</h3>
+<h4>What is the function of a Ruffini receptor?</h4>
 <b class=""text-success"">Skin receptors signal movement of the skin. An example being Ruffini receptors, they detect skin stretch. </b>
 <br>
 <br>
@@ -16,4 +18,6 @@ item,code,max time,text,shuffle 1,
 
 <h4>Intrafusal <b class='text-primary'>?</b> are embedded in <b class='text-primary'>?</b>. They are innervated by <b class='text-primary'>?</b> and <b class='text-primary'>?</b> endings that respond to changes of muscle length.
 </h4>
-<b class=""text-success"">Intrafusal muscle spindles are embedded in muscles. They are innervated by sensory endings and gamma motor endings that respond to changes of muscle length.</b>",off,
+<b class=""text-success"">Intrafusal muscle spindles are embedded in muscles. They are innervated by sensory endings and gamma motor endings that respond to changes of muscle length.</b>
+
+",off,
